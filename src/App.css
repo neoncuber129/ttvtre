@@ -433,6 +433,40 @@
   border-radius: var(--radius-sm);
 }
 
+.script-title {
+  color: var(--accent);
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.btn-back-default {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.error-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.error-screen h1 {
+  color: var(--danger);
+}
+
+.error-screen button {
+  background: var(--accent);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-sm);
+}
+
 .footer {
   text-align: center;
   padding: 1.5rem;

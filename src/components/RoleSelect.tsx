@@ -4,18 +4,20 @@ interface RoleSelectProps {
   lines: DialogueLine[]
   speakers: string[]
   selectedRole: string | null
+  scriptTitle: string | null
   onSelectRole: (role: string) => void
   onStart: () => void
-  onBack: () => void
+  onUploadOther: () => void
 }
 
 export function RoleSelect({
   lines,
   speakers,
   selectedRole,
+  scriptTitle,
   onSelectRole,
   onStart,
-  onBack,
+  onUploadOther,
 }: RoleSelectProps) {
   const countBySpeaker = speakers.map((speaker) => ({
     speaker,
@@ -25,13 +27,14 @@ export function RoleSelect({
   return (
     <section className="card">
       <div className="card-header-row">
-        <button type="button" className="btn-ghost" onClick={onBack}>
-          ← Quay lại
+        <button type="button" className="btn-ghost" onClick={onUploadOther}>
+          Tải file khác
         </button>
         <span className="badge">{lines.length} câu</span>
       </div>
 
       <h2>Chọn vai của bạn</h2>
+      {scriptTitle && <p className="script-title">{scriptTitle}</p>}
       <p className="muted">
         App sẽ gợi ý khi đến lượt vai bạn. Các câu của người khác cũng có gợi ý để bạn học phản hồi.
       </p>

@@ -5,9 +5,10 @@ interface FileUploadProps {
   loading: boolean
   error: string | null
   onClearError?: () => void
+  onUseDefault?: () => void
 }
 
-export function FileUpload({ onFileSelect, loading, error, onClearError }: FileUploadProps) {
+export function FileUpload({ onFileSelect, loading, error, onClearError, onUseDefault }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragOver, setDragOver] = useState(false)
   const [localError, setLocalError] = useState<string | null>(null)
@@ -26,9 +27,9 @@ export function FileUpload({ onFileSelect, loading, error, onClearError }: FileU
   return (
     <section className="card upload-card">
       <div className="card-icon">📄</div>
-      <h2>Tải file Word lên</h2>
+      <h2>Tải kịch bản khác</h2>
       <p className="muted">
-        App tự nhận diện lời thoại theo từng người. Định dạng mỗi dòng:
+        App đã có sẵn kịch bản Hải đoàn 18. Chỉ tải file mới nếu bạn muốn đổi kịch bản.
       </p>
       <div className="format-examples">
         <code>NAM: Kính thưa các đồng chí!</code>
@@ -76,6 +77,12 @@ export function FileUpload({ onFileSelect, loading, error, onClearError }: FileU
 
       {(error || localError) && (
         <p className="error-msg">{error || localError}</p>
+      )}
+
+      {onUseDefault && (
+        <button type="button" className="btn-ghost btn-back-default" onClick={onUseDefault}>
+          ← Dùng lại kịch bản Hải đoàn 18
+        </button>
       )}
     </section>
   )
