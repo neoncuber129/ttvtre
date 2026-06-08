@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import {
   getVoiceLabelForSpeaker,
   isSpeaking,
-  isSpeechSupported,
   speakLine,
   stopSpeaking,
 } from '../utils/speech'
@@ -16,24 +15,28 @@ interface SpeakButtonProps {
 
 export function SpeakButton({ text, speaker, label, compact }: SpeakButtonProps) {
   const [speaking, setSpeaking] = useState(false)
-  const supported = isSpeechSupported()
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     return () => {
-      if (speaking) stopSpeaking()
+      if (speaking || loading) stopSpeaking()
     }
-  }, [speaking])
+  }, [speaking, loading])
 
-  if (!supported) return null
-
-  const handleClick = () => {
-    if (isSpeaking()) {
+  const handleClick = async () => {
+    if (isSpeaking() || speaking) {
       stopSpeaking()
       setSpeaking(false)
+      setLoading(false)
       return
     }
 
-    const ok = speakLine(text, speaker, () => setSpeaking(false))
+    setLoading(true)
+    const ok = await speakLine(text, speaker, () => {
+      setSpeaking(false)
+      setLoading(false)
+    })
+    setLoading(false)
     if (ok) setSpeaking(true)
   }
 
@@ -42,10 +45,11 @@ export function SpeakButton({ text, speaker, label, compact }: SpeakButtonProps)
       type="button"
       className={`btn-speak ${speaking ? 'speaking' : ''} ${compact ? 'btn-speak-compact' : ''}`}
       onClick={handleClick}
+      disabled={loading}
       aria-label={speaking ? 'Dừng đọc' : getVoiceLabelForSpeaker(speaker)}
       title={getVoiceLabelForSpeaker(speaker)}
     >
-      {speaking ? '⏹ Dừng' : `🔊 ${label ?? 'Đọc'}`}
+      {loading ? '⏳' : speaking ? '⏹ Dừng' : `🔊 ${label ?? 'Đọc'}`}
     </button>
   )
 }

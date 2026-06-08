@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import type { DialogueLine } from '../types'
 import { SpeakButton } from './SpeakButton'
 import { buildHint, getMaxHintLevel, hintLevelLabel } from '../utils/hints'
-import { isSpeechSupported, speakLine, stopSpeaking } from '../utils/speech'
+import { speakLine, stopSpeaking } from '../utils/speech'
 
 interface PracticeViewProps {
   lines: DialogueLine[]
@@ -40,8 +40,10 @@ export function PracticeView({
     setShowAnswer(false)
     stopSpeaking()
 
-    if (!isMyTurn && isSpeechSupported()) {
-      const timer = setTimeout(() => speakLine(line.text, line.speaker), 300)
+    if (!isMyTurn) {
+      const timer = setTimeout(() => {
+        void speakLine(line.text, line.speaker)
+      }, 300)
       return () => {
         clearTimeout(timer)
         stopSpeaking()

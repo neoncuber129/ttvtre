@@ -24,10 +24,37 @@ CẢ HAI: KHÁT VỌNG VIỆT NAM – BẢN LĨNH VƯƠN MÌNH!
 
 App tự bỏ tiêu đề, chương và chỉ dẫn sân khấu `(Nhạc nền...)`.
 
+## Google Text-to-Speech (giọng nam / nữ)
+
+App dùng [Google Cloud TTS](https://cloud.google.com/text-to-speech):
+
+| Vai | Giọng Google |
+|-----|----------------|
+| NAM, CẢ ĐỘI | `vi-VN-Neural2-D` (nam) |
+| NỮ, CẢ HAI | `vi-VN-Neural2-A` (nữ) |
+
+### Cấu hình API key
+
+1. Vào [Google Cloud Console](https://console.cloud.google.com/)
+2. Tạo project → bật **Cloud Text-to-Speech API**
+3. **APIs & Services → Credentials → Create API key**
+4. (Khuyên dùng) Giới hạn key chỉ cho Text-to-Speech API
+
+**Local:** tạo file `.env.local`:
+
+```
+GOOGLE_TTS_API_KEY=your_api_key_here
+```
+
+**Vercel:** Project → **Settings → Environment Variables** → thêm `GOOGLE_TTS_API_KEY` → Redeploy.
+
+Endpoint proxy: `POST /api/tts` → `https://texttospeech.googleapis.com/v1/text:synthesize`
+
 ## Chạy local
 
 ```bash
 npm install
+cp .env.example .env.local   # rồi điền API key
 npm run dev
 ```
 
