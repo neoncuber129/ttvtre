@@ -471,6 +471,42 @@
   margin-top: 0.5rem;
 }
 
+.auto-play-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.6rem;
+  min-height: var(--touch-min);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.auto-play-toggle.on {
+  background: var(--success-soft);
+  border-color: rgba(62, 207, 142, 0.35);
+  color: var(--text);
+}
+
+.auto-play-toggle.on strong {
+  color: var(--success);
+}
+
+.auto-play-toggle.off strong {
+  color: var(--text-muted);
+}
+
+.auto-play-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .progress-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--accent), var(--success));

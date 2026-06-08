@@ -14,8 +14,20 @@ interface PracticeViewProps {
   onPreview: () => void
 }
 
+const AUTO_PLAY_KEY = 'autoPlayPartner'
+
 function sameRole(a: string, b: string): boolean {
   return a.trim().toUpperCase() === b.trim().toUpperCase()
+}
+
+function loadAutoPlayPreference(): boolean {
+  try {
+    const saved = localStorage.getItem(AUTO_PLAY_KEY)
+    if (saved === null) return true
+    return saved === 'true'
+  } catch {
+    return true
+  }
 }
 
 export function PracticeView({
@@ -29,6 +41,7 @@ export function PracticeView({
 }: PracticeViewProps) {
   const [hintLevel, setHintLevel] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
+  const [autoPlayPartner, setAutoPlayPartner] = useState(loadAutoPlayPreference)
 
   const line = lines[currentIndex]
   const isMyTurn = sameRole(line.speaker, myRole)
@@ -40,7 +53,7 @@ export function PracticeView({
     setShowAnswer(false)
     stopSpeaking()
 
-    if (!isMyTurn) {
+    if (!isMyTurn && autoPlayPartner) {
       const timer = setTimeout(() => {
         void speakLine(line.text, line.speaker)
       }, 300)
@@ -49,7 +62,20 @@ export function PracticeView({
         stopSpeaking()
       }
     }
-  }, [currentIndex, myRole, isMyTurn, line.text, line.speaker])
+  }, [currentIndex, myRole, isMyTurn, autoPlayPartner, line.text, line.speaker])
+
+  const toggleAutoPlay = () => {
+    setAutoPlayPartner((prev) => {
+      const next = !prev
+      try {
+        localStorage.setItem(AUTO_PLAY_KEY, String(next))
+      } catch {
+        /* ignore */
+      }
+      if (!next) stopSpeaking()
+      return next
+    })
+  }
 
   const handleNext = () => {
     stopSpeaking()
@@ -82,6 +108,18 @@ export function PracticeView({
         <div className="progress-bar">
           <div className="progress-fill" style={{ width: `${progress}%` }} />
         </div>
+
+        <button
+          type="button"
+          className={`auto-play-toggle ${autoPlayPartner ? 'on' : 'off'}`}
+          onClick={toggleAutoPlay}
+          aria-pressed={autoPlayPartner}
+        >
+          <span className="auto-play-icon">{autoPlayPartner ? '🔊' : '🔇'}</span>
+          <span className="auto-play-text">
+            Tự đọc vai khác: <strong>{autoPlayPartner ? 'Bật' : 'Tắt'}</strong>
+          </span>
+        </button>
       </div>
 
       <div className={`practice-card ${isMyTurn ? 'my-turn' : 'partner-turn'}`}>
@@ -137,7 +175,10 @@ export function PracticeView({
           <>
             <div className="dialogue-text dialogue-full">{line.text}</div>
             <div className="partner-label">
-              Đáp án đầy đủ · {line.speaker === 'NỮ' || line.speaker === 'CẢ HAI' ? 'Giọng nữ' : 'Giọng nam'} tự đọc
+              Đáp án đầy đủ
+              {autoPlayPartner
+                ? ` · ${line.speaker === 'NỮ' || line.speaker === 'CẢ HAI' ? 'Giọng nữ' : 'Giọng nam'} tự đọc`
+                : ' · Bấm 🔊 Đọc để nghe'}
             </div>
           </>
         )}
