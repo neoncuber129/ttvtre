@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { DialogueLine } from '../types'
 import { SpeakButton } from './SpeakButton'
+import { ToggleSwitch } from './ToggleSwitch'
 import { buildHint, getMaxHintLevel, hintLevelLabel } from '../utils/hints'
 import { speakLine, stopSpeaking } from '../utils/speech'
 
@@ -23,10 +24,10 @@ function sameRole(a: string, b: string): boolean {
 function loadAutoPlayPreference(): boolean {
   try {
     const saved = localStorage.getItem(AUTO_PLAY_KEY)
-    if (saved === null) return true
+    if (saved === null) return false
     return saved === 'true'
   } catch {
-    return true
+    return false
   }
 }
 
@@ -64,17 +65,14 @@ export function PracticeView({
     }
   }, [currentIndex, myRole, isMyTurn, autoPlayPartner, line.text, line.speaker])
 
-  const toggleAutoPlay = () => {
-    setAutoPlayPartner((prev) => {
-      const next = !prev
-      try {
-        localStorage.setItem(AUTO_PLAY_KEY, String(next))
-      } catch {
-        /* ignore */
-      }
-      if (!next) stopSpeaking()
-      return next
-    })
+  const handleAutoPlayChange = (enabled: boolean) => {
+    setAutoPlayPartner(enabled)
+    try {
+      localStorage.setItem(AUTO_PLAY_KEY, String(enabled))
+    } catch {
+      /* ignore */
+    }
+    if (!enabled) stopSpeaking()
   }
 
   const handleNext = () => {
@@ -109,17 +107,11 @@ export function PracticeView({
           <div className="progress-fill" style={{ width: `${progress}%` }} />
         </div>
 
-        <button
-          type="button"
-          className={`auto-play-toggle ${autoPlayPartner ? 'on' : 'off'}`}
-          onClick={toggleAutoPlay}
-          aria-pressed={autoPlayPartner}
-        >
-          <span className="auto-play-icon">{autoPlayPartner ? '🔊' : '🔇'}</span>
-          <span className="auto-play-text">
-            Tự đọc vai khác: <strong>{autoPlayPartner ? 'Bật' : 'Tắt'}</strong>
-          </span>
-        </button>
+        <ToggleSwitch
+          label="Tự đọc vai khác"
+          checked={autoPlayPartner}
+          onChange={handleAutoPlayChange}
+        />
       </div>
 
       <div className={`practice-card ${isMyTurn ? 'my-turn' : 'partner-turn'}`}>

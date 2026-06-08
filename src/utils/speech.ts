@@ -12,28 +12,25 @@ export function stopSpeaking(): void {
     currentAudio.currentTime = 0
     currentAudio = null
   }
-  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-    window.speechSynthesis.cancel()
-  }
 }
 
 export function isSpeaking(): boolean {
-  if (currentAudio && !currentAudio.paused) return true
-  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-    return window.speechSynthesis.speaking
-  }
-  return false
+  return currentAudio !== null && !currentAudio.paused
 }
 
 export function getVoiceLabelForSpeaker(speaker: string): string {
   return getVoiceLabel(speaker)
 }
 
-async function speakViaGoogle(
+export async function speakLine(
   text: string,
   speaker: string,
   onEnd?: () => void,
 ): Promise<boolean> {
+  if (!text.trim()) return false
+
+  stopSpeaking()
+
   const res = await fetch('/api/tts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -42,10 +39,15 @@ async function speakViaGoogle(
 
   const data = (await res.json()) as { audioContent?: string; error?: string }
   if (!res.ok) {
-    throw new Error(data.error ?? 'Google TTS thất bại')
+    console.error(data.error ?? 'Google TTS thất bại')
+    onEnd?.()
+    return false
   }
 
-  if (!data.audioContent) return false
+  if (!data.audioContent) {
+    onEnd?.()
+    return false
+  }
 
   const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`)
   currentAudio = audio
@@ -59,48 +61,13 @@ async function speakViaGoogle(
     onEnd?.()
   }
 
-  await audio.play()
-  return true
-}
-
-function speakViaBrowser(
-  text: string,
-  speaker: string,
-  onEnd?: () => void,
-): boolean {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-    return false
-  }
-
-  const role = speaker.trim().toUpperCase()
-  const isFemale = role === 'NỮ' || role === 'CẢ HAI'
-  const utterance = new SpeechSynthesisUtterance(text)
-  utterance.lang = 'vi-VN'
-  utterance.pitch = isFemale ? 1.2 : 0.75
-  utterance.rate = 0.95
-
-  if (onEnd) {
-    utterance.onend = () => onEnd()
-    utterance.onerror = () => onEnd()
-  }
-
-  window.speechSynthesis.speak(utterance)
-  return true
-}
-
-export async function speakLine(
-  text: string,
-  speaker: string,
-  onEnd?: () => void,
-): Promise<boolean> {
-  if (!text.trim()) return false
-
-  stopSpeaking()
-
   try {
-    return await speakViaGoogle(text, speaker, onEnd)
+    await audio.play()
+    return true
   } catch {
-    return speakViaBrowser(text, speaker, onEnd)
+    currentAudio = null
+    onEnd?.()
+    return false
   }
 }
 
