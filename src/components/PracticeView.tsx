@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import type { DialogueLine } from '../types'
+import { SpeakButton } from './SpeakButton'
 import { buildHint, getMaxHintLevel, hintLevelLabel } from '../utils/hints'
+import { isSpeechSupported, speakLine, stopSpeaking } from '../utils/speech'
 
 interface PracticeViewProps {
   lines: DialogueLine[]
@@ -36,10 +38,26 @@ export function PracticeView({
   useEffect(() => {
     setHintLevel(0)
     setShowAnswer(false)
-  }, [currentIndex, myRole])
+    stopSpeaking()
 
-  const handleNext = () => onNext()
-  const handlePrev = () => onPrev()
+    if (!isMyTurn && isSpeechSupported()) {
+      const timer = setTimeout(() => speakLine(line.text, line.speaker), 300)
+      return () => {
+        clearTimeout(timer)
+        stopSpeaking()
+      }
+    }
+  }, [currentIndex, myRole, isMyTurn, line.text, line.speaker])
+
+  const handleNext = () => {
+    stopSpeaking()
+    onNext()
+  }
+
+  const handlePrev = () => {
+    stopSpeaking()
+    onPrev()
+  }
 
   return (
     <section className="practice-wrap">
@@ -65,8 +83,11 @@ export function PracticeView({
       </div>
 
       <div className={`practice-card ${isMyTurn ? 'my-turn' : 'partner-turn'}`}>
-        <div className="turn-badge">
-          {isMyTurn ? '🎭 Lượt bạn' : `👤 ${line.speaker}`}
+        <div className="turn-row">
+          <div className="turn-badge">
+            {isMyTurn ? '🎭 Lượt bạn' : `👤 ${line.speaker}`}
+          </div>
+          <SpeakButton text={line.text} speaker={line.speaker} compact />
         </div>
 
         {isMyTurn ? (
@@ -113,7 +134,7 @@ export function PracticeView({
         ) : (
           <>
             <div className="dialogue-text dialogue-full">{line.text}</div>
-            <div className="partner-label">Đáp án đầy đủ</div>
+            <div className="partner-label">Đáp án đầy đủ · Tự đọc khi chuyển câu</div>
           </>
         )}
       </div>

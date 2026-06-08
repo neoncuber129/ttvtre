@@ -502,14 +502,52 @@
   background: linear-gradient(180deg, var(--bg-card) 0%, rgba(240, 180, 41, 0.06) 100%);
 }
 
+.turn-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
 .turn-badge {
   font-size: 0.8rem;
   font-weight: 600;
   padding: 0.35rem 0.85rem;
   border-radius: 999px;
   width: fit-content;
-  margin: 0 auto;
   flex-shrink: 0;
+}
+
+.btn-speak {
+  flex-shrink: 0;
+  min-height: 36px;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.btn-speak-compact {
+  min-height: 34px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+}
+
+.btn-speak.speaking {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.script-line-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
 }
 
 .my-turn .turn-badge {

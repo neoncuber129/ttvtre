@@ -1,4 +1,5 @@
 import type { DialogueLine } from '../types'
+import { SpeakButton } from './SpeakButton'
 
 interface ScriptPreviewProps {
   lines: DialogueLine[]
@@ -38,7 +39,10 @@ export function ScriptPreview({
           >
             <span className="script-line-num">{index + 1}</span>
             <div className="script-line-body">
-              <span className="script-speaker">{line.speaker}</span>
+              <div className="script-line-top">
+                <span className="script-speaker">{line.speaker}</span>
+                <SpeakButton text={line.text} speaker={line.speaker} compact label="Nghe" />
+              </div>
               <p className="script-text">{line.text}</p>
             </div>
           </li>
