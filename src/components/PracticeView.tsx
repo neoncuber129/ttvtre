@@ -56,7 +56,7 @@ export function PracticeView({
 
     if (!isMyTurn && autoPlayPartner) {
       const timer = setTimeout(() => {
-        void speakLine(line.text, line.speaker)
+        speakLine(line.text, line.speaker)
       }, 300)
       return () => {
         clearTimeout(timer)
@@ -169,7 +169,7 @@ export function PracticeView({
             <div className="partner-label">
               Đáp án đầy đủ
               {autoPlayPartner
-                ? ` · ${line.speaker === 'NỮ' || line.speaker === 'CẢ HAI' ? 'Giọng nữ' : 'Giọng nam'} tự đọc`
+                ? ` · ${line.speaker === 'NỮ' || line.speaker === 'CẢ HAI' ? 'Giọng nữ' : 'Giọng nam'} (tự đọc)`
                 : ' · Bấm 🔊 Đọc để nghe'}
             </div>
           </>
