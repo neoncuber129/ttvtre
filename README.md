@@ -4,7 +4,9 @@ Web app giúp học thuộc lời thoại từ file Word (.docx).
 
 ## Tính năng
 
-- Tải file Word, tự nhận diện lời của từng nhân vật (Nam, Nữ, hoặc tên bất kỳ)
+- **Kịch bản Hải đoàn 18 có sẵn** — mở app là học luôn, không cần upload
+- Tải file Word khác nếu muốn đổi kịch bản
+- Tự nhận diện lời NAM, NỮ, CẢ ĐỘI, CẢ HAI
 - Chọn vai bạn đóng
 - Luyện từng câu với **gợi ý dần** (từ ít → nhiều → hiện đáp án)
 - Nút **Chuyển** để sang câu tiếp theo (cả lời của bạn và người kia)
@@ -29,15 +31,33 @@ npm install
 npm run dev
 ```
 
-## Deploy GitHub Pages
+## Deploy Vercel (khuyên dùng)
 
-1. Push code lên GitHub
-2. Vào **Settings → Pages → Build and deployment → Source: GitHub Actions**
-3. Mỗi lần push lên `main`/`master`, workflow tự build và deploy
+1. Vào [vercel.com](https://vercel.com) → đăng nhập bằng **GitHub**
+2. **Add New → Project**
+3. Chọn repo **neoncuber129/ttvtre** → **Import**
+4. Giữ mặc định (Vercel tự nhận Vite):
 
-**Live:** [https://neoncuber129.github.io/ttvtre/](https://neoncuber129.github.io/ttvtre/)
+   | Mục | Giá trị |
+   |-----|---------|
+   | Framework Preset | Vite |
+   | Build Command | `npm run build` |
+   | Output Directory | `dist` |
+   | Install Command | `npm install` |
+
+5. **Không** thêm biến `VITE_BASE_PATH` (để trống)
+6. Bấm **Deploy** → đợi 1–2 phút
+
+Mỗi lần push lên `main`, Vercel tự deploy lại.
 
 Repo: [neoncuber129/ttvtre](https://github.com/neoncuber129/ttvtre)
+
+## Deploy GitHub Pages (tùy chọn)
+
+Chỉ dùng nếu muốn host trên `github.io`. Workflow đã set `VITE_BASE_PATH=/ttvtre/`.
+
+1. **Settings → Pages → Source: GitHub Actions**
+2. URL: [https://neoncuber129.github.io/ttvtre/](https://neoncuber129.github.io/ttvtre/)
 
 ## Công nghệ
 
