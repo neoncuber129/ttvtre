@@ -9,17 +9,18 @@ Web app giúp học thuộc lời thoại từ file Word (.docx).
 - Luyện từng câu với **gợi ý dần** (từ ít → nhiều → hiện đáp án)
 - Nút **Chuyển** để sang câu tiếp theo (cả lời của bạn và người kia)
 
-## Định dạng file Word
+## Định dạng file Word (kịch bản tuyên truyền)
 
-Mỗi dòng lời thoại cần có tên nhân vật ở đầu:
+Mỗi lời thoại bắt đầu bằng vai diễn:
 
 ```
-Nam: Xin chào em, hôm nay em thế nào?
-Nữ - Chào anh, em khỏe ạ.
-[Giáo viên] Các em mở sách trang 10.
+NAM: Kính thưa thủ trưởng! Kính thưa các đồng chí!
+NỮ: Lịch sử dân tộc Việt Nam là lịch sử của những khát vọng lớn lao.
+CẢ ĐỘI: Nguyện tuyệt đối trung thành với Đảng!
+CẢ HAI: KHÁT VỌNG VIỆT NAM – BẢN LĨNH VƯƠN MÌNH!
 ```
 
-Hỗ trợ các ký hiệu: `:`, `-`, `[Tên]`, `|`
+App tự bỏ tiêu đề, chương và chỉ dẫn sân khấu `(Nhạc nền...)`.
 
 ## Chạy local
 
