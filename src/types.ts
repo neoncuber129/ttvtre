@@ -4,4 +4,4 @@ export interface DialogueLine {
   text: string
 }
 
-export type AppStep = 'loading' | 'upload' | 'select-role' | 'practice'
+export type AppStep = 'loading' | 'upload' | 'select-role' | 'preview' | 'practice'

@@ -3,6 +3,7 @@ import { FileUpload } from './components/FileUpload'
 import { LoadingScreen } from './components/LoadingScreen'
 import { PracticeView } from './components/PracticeView'
 import { RoleSelect } from './components/RoleSelect'
+import { ScriptPreview } from './components/ScriptPreview'
 import type { AppStep, DialogueLine } from './types'
 import { getUniqueSpeakers } from './utils/parseDialogue'
 import { loadDefaultScript } from './utils/loadDefaultScript'
@@ -17,8 +18,14 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [previewReturnStep, setPreviewReturnStep] = useState<AppStep>('select-role')
 
   const speakers = useMemo(() => getUniqueSpeakers(lines), [lines])
+
+  const openPreview = (returnTo: AppStep) => {
+    setPreviewReturnStep(returnTo)
+    setStep('preview')
+  }
 
   const applyScript = (title: string, parsed: DialogueLine[]) => {
     setLines(parsed)
@@ -66,18 +73,20 @@ function App() {
   }
 
   return (
-    <div className="app">
-      <header className="hero">
-        <div className="hero-glow" />
-        <h1>Hỗ Trợ Học Thuộc</h1>
-        <p>
-          {scriptTitle
-            ? `Kịch bản: ${scriptTitle}`
-            : 'Chọn vai → luyện từng câu với gợi ý thông minh'}
-        </p>
-      </header>
+    <div className={`app ${step === 'preview' ? 'app-preview' : ''}`}>
+      {step !== 'preview' && (
+        <header className="hero">
+          <div className="hero-glow" />
+          <h1>Hỗ Trợ Học Thuộc</h1>
+          <p>
+            {scriptTitle
+              ? `Kịch bản: ${scriptTitle}`
+              : 'Chọn vai → luyện từng câu với gợi ý thông minh'}
+          </p>
+        </header>
+      )}
 
-      <main className="main">
+      <main className={step === 'preview' ? 'main-preview' : 'main'}>
         {step === 'loading' && <LoadingScreen />}
 
         {step === 'upload' && (
@@ -102,6 +111,16 @@ function App() {
               setStep('practice')
             }}
             onUploadOther={() => setStep('upload')}
+            onPreview={() => openPreview('select-role')}
+          />
+        )}
+
+        {step === 'preview' && (
+          <ScriptPreview
+            lines={lines}
+            scriptTitle={scriptTitle}
+            selectedRole={selectedRole}
+            onBack={() => setStep(previewReturnStep)}
           />
         )}
 
@@ -118,15 +137,17 @@ function App() {
               }
             }}
             onPrev={() => setCurrentIndex((i) => Math.max(0, i - 1))}
-            onChangeScript={() => setStep('upload')}
             onChangeRole={() => setStep('select-role')}
+            onPreview={() => openPreview('practice')}
           />
         )}
       </main>
 
-      <footer className="footer">
-        Kịch bản Hải đoàn 18 có sẵn · Có thể tải file .docx khác nếu cần
-      </footer>
+      {step !== 'preview' && (
+        <footer className="footer">
+          Kịch bản Hải đoàn 18 có sẵn · Có thể tải file .docx khác nếu cần
+        </footer>
+      )}
     </div>
   )
 }

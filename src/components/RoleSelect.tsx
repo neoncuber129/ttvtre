@@ -8,6 +8,7 @@ interface RoleSelectProps {
   onSelectRole: (role: string) => void
   onStart: () => void
   onUploadOther: () => void
+  onPreview: () => void
 }
 
 export function RoleSelect({
@@ -18,6 +19,7 @@ export function RoleSelect({
   onSelectRole,
   onStart,
   onUploadOther,
+  onPreview,
 }: RoleSelectProps) {
   const countBySpeaker = speakers.map((speaker) => ({
     speaker,
@@ -56,16 +58,13 @@ export function RoleSelect({
         ))}
       </div>
 
-      <details className="preview-details">
-        <summary>Xem trước kịch bản</summary>
-        <ol className="preview-list">
-          {lines.map((line) => (
-            <li key={line.id} className={selectedRole === line.speaker ? 'mine' : ''}>
-              <strong>{line.speaker}:</strong> {line.text}
-            </li>
-          ))}
-        </ol>
-      </details>
+      <button
+        type="button"
+        className="btn-secondary btn-large btn-preview-open"
+        onClick={onPreview}
+      >
+        Xem trước kịch bản
+      </button>
 
       <button
         type="button"

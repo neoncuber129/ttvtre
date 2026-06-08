@@ -8,8 +8,8 @@ interface PracticeViewProps {
   currentIndex: number
   onNext: () => void
   onPrev: () => void
-  onChangeScript: () => void
   onChangeRole: () => void
+  onPreview: () => void
 }
 
 function sameRole(a: string, b: string): boolean {
@@ -22,8 +22,8 @@ export function PracticeView({
   currentIndex,
   onNext,
   onPrev,
-  onChangeScript,
   onChangeRole,
+  onPreview,
 }: PracticeViewProps) {
   const [hintLevel, setHintLevel] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
@@ -54,8 +54,8 @@ export function PracticeView({
             </span>
             <span className="my-role-tag">Vai: {myRole}</span>
           </div>
-          <button type="button" className="btn-ghost btn-compact" onClick={onChangeScript}>
-            Đổi KB
+          <button type="button" className="btn-ghost btn-compact" onClick={onPreview}>
+            Kịch bản
           </button>
         </div>
 
