@@ -36,7 +36,7 @@ export function RoleSelect({
       <h2>Chọn vai của bạn</h2>
       {scriptTitle && <p className="script-title">{scriptTitle}</p>}
       <p className="muted">
-        App sẽ gợi ý khi đến lượt vai bạn. Các câu của người khác cũng có gợi ý để bạn học phản hồi.
+        Gợi ý khi đến lượt vai bạn. Câu của người khác hiện đầy đủ.
       </p>
 
       <div className="role-grid">

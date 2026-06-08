@@ -118,7 +118,7 @@ function App() {
               }
             }}
             onPrev={() => setCurrentIndex((i) => Math.max(0, i - 1))}
-            onRestart={resetToDefault}
+            onChangeScript={() => setStep('upload')}
             onChangeRole={() => setStep('select-role')}
           />
         )}
