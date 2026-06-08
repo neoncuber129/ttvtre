@@ -2,6 +2,8 @@ export function isSpeechSupported(): boolean {
   return typeof window !== 'undefined' && 'speechSynthesis' in window
 }
 
+type VoiceGender = 'male' | 'female'
+
 let voicesCache: SpeechSynthesisVoice[] = []
 
 function loadVoices(): SpeechSynthesisVoice[] {
@@ -16,21 +18,90 @@ if (isSpeechSupported()) {
   window.speechSynthesis.onvoiceschanged = () => loadVoices()
 }
 
-function pickVietnameseVoice(): SpeechSynthesisVoice | null {
-  const voices = loadVoices()
-  return (
-    voices.find((v) => v.lang === 'vi-VN') ??
-    voices.find((v) => v.lang.startsWith('vi')) ??
-    voices.find((v) => v.name.toLowerCase().includes('vietnam')) ??
-    null
+function getVietnameseVoices(): SpeechSynthesisVoice[] {
+  return loadVoices().filter(
+    (v) => v.lang === 'vi-VN' || v.lang.startsWith('vi'),
   )
 }
 
-export function getSpeechStyle(speaker: string): { pitch: number; rate: number } {
+function scoreMaleVoice(name: string): number {
+  const n = name.toLowerCase()
+  let score = 0
+
+  if (/namminh|nam minh/.test(n)) score += 100
+  if (/\bmale\b/.test(n)) score += 90
+  if (/\bman\b/.test(n)) score += 80
+  if (/\bnam\b/.test(n) && !/vietnam|viet nam/.test(n)) score += 70
+  if (/hung|minh|david|mark/.test(n)) score += 40
+
+  if (/\bfemale\b|\bwoman\b/.test(n)) score -= 80
+  if (/\ban\b|hoai|hoài|linh|my an|zira/.test(n)) score -= 60
+
+  return score
+}
+
+function scoreFemaleVoice(name: string): number {
+  const n = name.toLowerCase()
+  let score = 0
+
+  if (/\ban\b/.test(n) && /microsoft|online|natural/.test(n)) score += 100
+  if (/\bfemale\b/.test(n)) score += 90
+  if (/\bwoman\b/.test(n)) score += 80
+  if (/hoai|hoài|linh|my|nữ| nu /.test(n)) score += 60
+  if (/google.*vi/.test(n) && !/nam/.test(n)) score += 30
+
+  if (/namminh|nam minh|\bmale\b|\bman\b/.test(n)) score -= 80
+  if (/\bnam\b/.test(n) && !/vietnam|viet nam/.test(n)) score -= 60
+
+  return score
+}
+
+function pickVoiceByGender(gender: VoiceGender): SpeechSynthesisVoice | null {
+  const voices = getVietnameseVoices()
+  if (voices.length === 0) return null
+
+  const scoreFn = gender === 'male' ? scoreMaleVoice : scoreFemaleVoice
+  const ranked = voices
+    .map((v) => ({ voice: v, score: scoreFn(v.name) + (v.localService ? 2 : 0) }))
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+
+  if (ranked.length > 0) return ranked[0].voice
+
+  return voices[0] ?? null
+}
+
+function getTargetGender(speaker: string): VoiceGender {
   const role = speaker.trim().toUpperCase()
-  if (role === 'NAM') return { pitch: 0.82, rate: 0.95 }
-  if (role === 'NỮ') return { pitch: 1.12, rate: 1.0 }
-  return { pitch: 1.0, rate: 0.9 }
+  if (role === 'NỮ' || role === 'CẢ HAI') return 'female'
+  return 'male'
+}
+
+function resolveSpeech(speaker: string): {
+  voice: SpeechSynthesisVoice | null
+  pitch: number
+  rate: number
+  usedGenderVoice: boolean
+} {
+  const gender = getTargetGender(speaker)
+  const voice = pickVoiceByGender(gender)
+  const scoreFn = gender === 'male' ? scoreMaleVoice : scoreFemaleVoice
+  const usedGenderVoice = voice ? scoreFn(voice.name) > 0 : false
+
+  if (usedGenderVoice) {
+    return {
+      voice,
+      pitch: 1,
+      rate: gender === 'female' ? 1.0 : 0.95,
+      usedGenderVoice: true,
+    }
+  }
+
+  if (gender === 'female') {
+    return { voice, pitch: 1.28, rate: 1.02, usedGenderVoice: false }
+  }
+
+  return { voice, pitch: 0.72, rate: 0.92, usedGenderVoice: false }
 }
 
 export function stopSpeaking(): void {
@@ -43,23 +114,18 @@ export function isSpeaking(): boolean {
   return window.speechSynthesis.speaking
 }
 
-export function speakLine(
+function speakWithConfig(
   text: string,
   speaker: string,
   onEnd?: () => void,
 ): boolean {
-  if (!isSpeechSupported() || !text.trim()) return false
-
-  stopSpeaking()
-
+  const { voice, pitch, rate } = resolveSpeech(speaker)
   const utterance = new SpeechSynthesisUtterance(text)
-  const voice = pickVietnameseVoice()
-  const style = getSpeechStyle(speaker)
 
   utterance.lang = voice?.lang ?? 'vi-VN'
   if (voice) utterance.voice = voice
-  utterance.pitch = style.pitch
-  utterance.rate = style.rate
+  utterance.pitch = pitch
+  utterance.rate = rate
 
   if (onEnd) {
     utterance.onend = () => onEnd()
@@ -70,6 +136,33 @@ export function speakLine(
   return true
 }
 
+export function speakLine(
+  text: string,
+  speaker: string,
+  onEnd?: () => void,
+): boolean {
+  if (!isSpeechSupported() || !text.trim()) return false
+
+  stopSpeaking()
+
+  if (getVietnameseVoices().length === 0) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      window.speechSynthesis.onvoiceschanged = null
+      speakWithConfig(text, speaker, onEnd)
+    }
+    return true
+  }
+
+  return speakWithConfig(text, speaker, onEnd)
+}
+
 export function hasVietnameseVoice(): boolean {
-  return pickVietnameseVoice() !== null
+  return getVietnameseVoices().length > 0
+}
+
+export function getVoiceLabelForSpeaker(speaker: string): string {
+  const gender = getTargetGender(speaker)
+  const voice = pickVoiceByGender(gender)
+  if (!voice) return gender === 'male' ? 'Giọng nam' : 'Giọng nữ'
+  return `${gender === 'male' ? 'Giọng nam' : 'Giọng nữ'}: ${voice.name}`
 }

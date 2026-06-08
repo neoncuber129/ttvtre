@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react'
-import { isSpeaking, isSpeechSupported, speakLine, stopSpeaking } from '../utils/speech'
+import {
+  getVoiceLabelForSpeaker,
+  isSpeaking,
+  isSpeechSupported,
+  speakLine,
+  stopSpeaking,
+} from '../utils/speech'
 
 interface SpeakButtonProps {
   text: string
@@ -36,7 +42,8 @@ export function SpeakButton({ text, speaker, label, compact }: SpeakButtonProps)
       type="button"
       className={`btn-speak ${speaking ? 'speaking' : ''} ${compact ? 'btn-speak-compact' : ''}`}
       onClick={handleClick}
-      aria-label={speaking ? 'Dừng đọc' : 'Đọc thoại'}
+      aria-label={speaking ? 'Dừng đọc' : getVoiceLabelForSpeaker(speaker)}
+      title={getVoiceLabelForSpeaker(speaker)}
     >
       {speaking ? '⏹ Dừng' : `🔊 ${label ?? 'Đọc'}`}
     </button>

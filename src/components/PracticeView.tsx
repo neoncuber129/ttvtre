@@ -134,7 +134,9 @@ export function PracticeView({
         ) : (
           <>
             <div className="dialogue-text dialogue-full">{line.text}</div>
-            <div className="partner-label">Đáp án đầy đủ · Tự đọc khi chuyển câu</div>
+            <div className="partner-label">
+              Đáp án đầy đủ · {line.speaker === 'NỮ' || line.speaker === 'CẢ HAI' ? 'Giọng nữ' : 'Giọng nam'} tự đọc
+            </div>
           </>
         )}
       </div>
